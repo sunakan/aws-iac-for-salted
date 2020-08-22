@@ -11,7 +11,7 @@ set -eu
 # - jq
 #
 # 実行方法
-# $ sh 01-up-vpc.sh
+# $ sh 01-up-vpc.sh ./variables.toml
 ################################################################################
 
 ################################################################################
@@ -20,14 +20,17 @@ set -eu
 export AWS_PAGER=""
 
 ################################################################################
-# 固定値
+# 変数
 ################################################################################
-readonly AWS_RESOURCE_STATES_FILE_PATH=$(cat ./variables.toml | rq -tJ | jq --raw-output '.aws_resource_states_file_path')
-readonly AWS_REGION=$(cat ./variables.toml | rq -tJ | jq --raw-output '.region')
-readonly VPC_NAME=$(cat ./variables.toml   | rq -tJ | jq --raw-output '.vpc.name')
-readonly VPC_CIDR=$(cat ./variables.toml   | rq -tJ | jq --raw-output '.vpc.cidr')
+readonly VARIABLES_FILE_PATH=$1
+readonly AWS_RESOURCE_STATES_FILE_PATH=$(cat ${VARIABLES_FILE_PATH} | rq -tJ | jq --raw-output '.aws_resource_states_file_path')
+readonly AWS_REGION=$(cat ${VARIABLES_FILE_PATH} | rq -tJ | jq --raw-output '.region')
+readonly VPC_NAME=$(cat ${VARIABLES_FILE_PATH}   | rq -tJ | jq --raw-output '.vpc.name')
+readonly VPC_CIDR=$(cat ${VARIABLES_FILE_PATH}   | rq -tJ | jq --raw-output '.vpc.cidr')
 
-# 事前チェック
+################################################################################
+# チェック
+################################################################################
 if [ -f "${AWS_RESOURCE_STATES_FILE_PATH}" ]; then
   readonly VPC_ID=$(cat ${AWS_RESOURCE_STATES_FILE_PATH} | rq -tJ | jq '.vpc.vpc_id')
   if [ "${VPC_ID}" != "null" ]; then
@@ -42,14 +45,16 @@ readonly vpc_count=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=${VPC
 if [ ${vpc_count} -gt 0 ] ; then
   echo 既に${VPC_NAME}という名前のVPCが存在するので終わります
   echo '----'
-  echo "$ aws ec2 describe-vpcs --filters Name=tag:Name,Values=${VPC_NAME} --filters Name=cidr,Values=${VPC_CIDR} --region ${AWS_REGION} | jq --raw-output '.Vpcs[0].VpcId' | xargs -I {vpc-id} /bin/sh -c \"cat ./variables.toml | rq -tJ | jq '.vpc.vpc_id |= \\\"{vpc-id}\\\"'\" | rq -jT | tee ${AWS_RESOURCE_STATES_FILE_PATH}"
+  echo "$ aws ec2 describe-vpcs --filters Name=tag:Name,Values=${VPC_NAME} --filters Name=cidr,Values=${VPC_CIDR} --region ${AWS_REGION} | jq --raw-output '.Vpcs[0].VpcId' | xargs -I {vpc-id} /bin/sh -c \"cat ${VARIABLES_FILE_PATH} | rq -tJ | jq '.vpc.vpc_id |= \\\"{vpc-id}\\\"'\" | rq -jT | tee ${AWS_RESOURCE_STATES_FILE_PATH}"
   echo '----'
   exit 1
 fi
 
+################################################################################
 # メイン
+################################################################################
 aws ec2 create-vpc --cidr-block ${VPC_CIDR} --tag-specifications "ResourceType=vpc,Tags=[{Key=Name,Value=${VPC_NAME}}]" --output json --region ${AWS_REGION} \
   | jq --raw-output '.Vpc.VpcId' \
-  | xargs -I {vpc-id} sh -c "cat ./variables.toml | rq -tJ | jq '.vpc.vpc_id |=\"{vpc-id}\"'" \
+  | xargs -I {vpc-id} sh -c "cat ${VARIABLES_FILE_PATH} | rq -tJ | jq '.vpc.vpc_id |=\"{vpc-id}\"'" \
   | rq -jT \
   | tee ${AWS_RESOURCE_STATES_FILE_PATH}

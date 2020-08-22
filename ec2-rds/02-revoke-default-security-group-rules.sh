@@ -12,7 +12,7 @@ set -eu
 # - jq
 #
 # 実行方法
-# $ sh 02-revoke-default-security-group-rules.sh
+# $ sh 02-revoke-default-security-group-rules.sh ./variables.toml
 ################################################################################
 
 ################################################################################
@@ -23,23 +23,34 @@ export AWS_PAGER=""
 ################################################################################
 # 変数
 ################################################################################
-readonly AWS_RESOURCE_STATES_FILE_PATH=$(cat ./variables.toml | rq -tJ | jq --raw-output '.aws_resource_states_file_path')
-if [ ! -e "${AWS_RESOURCE_STATES_FILE_PATH}" ]; then
-  echo "${AWS_RESOURCE_STATES_FILE_PATH}がありません"
-  echo "sh 01-up-vpc.sh"
-  exit 1
-fi
-
-readonly AWS_REGION=$(cat ${AWS_RESOURCE_STATES_FILE_PATH} | rq -tJ | jq --raw-output '.region')
-readonly VPC_ID=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}     | rq -tJ | jq --raw-output '.vpc.vpc_id')
-if [ "${VPC_ID}" = "null" ]; then
-  echo "VPCが未作成のようです"
-  echo "sh 01-up-vpc.sh"
-  exit 1
-fi
-
-# メイン
+readonly VARIABLES_FILE_PATH=$1
+readonly AWS_RESOURCE_STATES_FILE_PATH=$(cat ${VARIABLES_FILE_PATH} | rq -tJ | jq --raw-output '.aws_resource_states_file_path')
+readonly AWS_REGION=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}          | rq -tJ | jq --raw-output '.region')
+readonly VPC_ID=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}              | rq -tJ | jq --raw-output '.vpc.vpc_id')
 readonly DEFAULT_SG_ID=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=${VPC_ID}" --region ${AWS_REGION} | jq --raw-output '.SecurityGroups[] | select(.GroupName = "default") | .GroupId')
+
+################################################################################
+# チェック
+################################################################################
+if [ ! -f "${AWS_RESOURCE_STATES_FILE_PATH}" ]; then
+  echo "${AWS_RESOURCE_STATES_FILE_PATH}がありません"
+  echo '----'
+  grep '$ sh 01' 01-up-vpc.sh | sed -e "s/# //g"
+  echo '----'
+  exit 1
+fi
+aws ec2 describe-vpcs --vpc-id ${VPC_ID} --region ${AWS_REGION} > /dev/null \
+  || ( \
+    echo '構成ドリフトが起きてる可能性があります' \
+    && echo '----' \
+    && echo "$ rm ${AWS_RESOURCE_STATES_FILE_PATH}" \
+    && echo '----' \
+    && exit 1 \
+  )
+
+################################################################################
+# メイン
+################################################################################
 aws ec2 describe-security-groups --output json --group-ids ${DEFAULT_SG_ID} --region ${AWS_REGION} \
   | jq --raw-output --compact-output '.SecurityGroups[].IpPermissions' \
   | awk '$0!="[]"' \
