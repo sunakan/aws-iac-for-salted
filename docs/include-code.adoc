@@ -1,0 +1,23 @@
+== ソースコードの埋め込み
+
+[source,makefile]
+.行数指定可能
+----
+include::./Makefile[lines=5..13]
+----
+
+== 吹き出しソースコード
+
+[source,makefile]
+.吹き出し便利(これは埋め込みしてない)
+----
+.PHONY: hello
+hello: # <1>
+	echo hello
+
+.PHONY: world
+world:
+	echo world # <2>
+----
+<1> 便利じゃない？
+<2> あああ
