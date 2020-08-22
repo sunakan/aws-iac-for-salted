@@ -790,3 +790,4 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/c,c++,rust,python,ruby,rust,go,java,kotlin,node,erlang,elixir,commonlisp,racket,linux,macos,windows,vim,emacs,intellij+all,visualstudiocode,vagrant,ansible,terraform
 rq
+aws-resource-state-file.toml
