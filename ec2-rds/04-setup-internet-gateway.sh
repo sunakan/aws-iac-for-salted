@@ -12,7 +12,7 @@ set -eu
 # - jq
 #
 # 実行方法
-# $ sh 04-create-internet-gateway.sh ./variables.toml
+# $ sh 04-setup-internet-gateway.sh ./variables.toml
 #
 # 補足：メイン以下でよくわからなくなった場合
 #   - 最終行をコメントアウトして実行するとわかる
