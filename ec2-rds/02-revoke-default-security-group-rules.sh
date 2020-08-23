@@ -5,6 +5,7 @@ set -eu
 # - VPC作成時に自動で作られるdefault security groupのルールを全削除する
 #   - IpPermissionsの削除（インバウンドルール）
 #   - IpPermissionsEgressの削除（アウトバウンドルール）
+# - AWS_RESOURCE_STATES_FILEにdefault_security_group_idを記録
 #
 # 必須コマンド
 # - aws
@@ -13,6 +14,9 @@ set -eu
 #
 # 実行方法
 # $ sh 02-revoke-default-security-group-rules.sh ./variables.toml
+#
+# 補足：メイン以下でよくわからなくなった場合
+#   - 最終行をコメントアウトして実行するとわかる
 ################################################################################
 
 ################################################################################
