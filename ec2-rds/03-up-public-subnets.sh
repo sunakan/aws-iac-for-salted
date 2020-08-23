@@ -7,7 +7,7 @@ set -eu
 #
 # 必須コマンド
 # - aws
-# - rq
+# - yj
 # - jq
 #
 # 実行方法
@@ -26,11 +26,11 @@ export AWS_PAGER=""
 # 変数
 ################################################################################
 readonly VARIABLES_FILE_PATH=$1
-readonly AWS_RESOURCE_STATES_FILE_PATH=$(cat ${VARIABLES_FILE_PATH} | rq -tJ | jq --raw-output '.aws_resource_states_file_path')
+readonly AWS_RESOURCE_STATES_FILE_PATH=$(cat ${VARIABLES_FILE_PATH} | ./yj -tj | jq --raw-output '.aws_resource_states_file_path')
 
-readonly AWS_REGION=$(cat ${AWS_RESOURCE_STATES_FILE_PATH} | rq -tJ | jq --raw-output '.region')
-readonly VPC_ID=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}     | rq -tJ | jq --raw-output '.vpc.vpc_id')
-readonly VPC_SUBNETS=$(cat ${VARIABLES_FILE_PATH}          | rq -tJ | jq --compact-output --raw-output '.vpc_public_subnets.subnets')
+readonly AWS_REGION=$(cat ${AWS_RESOURCE_STATES_FILE_PATH} | ./yj -tj | jq --raw-output '.region')
+readonly VPC_ID=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}     | ./yj -tj | jq --raw-output '.vpc.vpc_id')
+readonly VPC_SUBNETS=$(cat ${VARIABLES_FILE_PATH}          | ./yj -tj | jq --compact-output --raw-output '.vpc_public_subnets.subnets')
 
 ################################################################################
 # チェック
@@ -65,4 +65,4 @@ echo ${VPC_SUBNETS} | jq --compact-output '.[]' | while read subnet_info; do
 done \
   | tail -n 1 \
   | sed 's/^.//' \
-  | xargs -0 -I {subnets} sh -c "cat ${AWS_RESOURCE_STATES_FILE_PATH} | rq -tJ | jq '.vpc_public_subnets.subnets |= [{subnets}]' | rq -jT | tee ${AWS_RESOURCE_STATES_FILE_PATH}"
+  | xargs -0 -I {subnets} sh -c "cat ${AWS_RESOURCE_STATES_FILE_PATH} | ./yj -tj | jq '.vpc_public_subnets.subnets |= [{subnets}]' | ./yj -jt | tee ${AWS_RESOURCE_STATES_FILE_PATH}"

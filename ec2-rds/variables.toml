@@ -5,6 +5,9 @@ region = "ap-northeast-1"
 name = "asahi"
 cidr = "172.27.0.0/16"
 
+[internet_gateway]
+name = "asahi-internet-gateway"
+
 [[vpc_public_subnets.subnets]]
 name = "asahi-public-a"
 cidr = "172.27.0.0/24"

@@ -9,7 +9,7 @@ set -eu
 #
 # 必須コマンド
 # - aws
-# - rq
+# - yj
 # - jq
 #
 # 実行方法
@@ -28,9 +28,9 @@ export AWS_PAGER=""
 # 変数
 ################################################################################
 readonly VARIABLES_FILE_PATH=$1
-readonly AWS_RESOURCE_STATES_FILE_PATH=$(cat ${VARIABLES_FILE_PATH} | rq -tJ | jq --raw-output '.aws_resource_states_file_path')
-readonly AWS_REGION=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}          | rq -tJ | jq --raw-output '.region')
-readonly VPC_ID=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}              | rq -tJ | jq --raw-output '.vpc.vpc_id')
+readonly AWS_RESOURCE_STATES_FILE_PATH=$(cat ${VARIABLES_FILE_PATH} | ./yj -tj | jq --raw-output '.aws_resource_states_file_path')
+readonly AWS_REGION=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}          | ./yj -tj | jq --raw-output '.region')
+readonly VPC_ID=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}              | ./yj -tj | jq --raw-output '.vpc.vpc_id')
 readonly DEFAULT_SG_ID=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=${VPC_ID}" --region ${AWS_REGION} | jq --raw-output '.SecurityGroups[] | select(.GroupName = "default") | .GroupId')
 
 ################################################################################
@@ -66,7 +66,7 @@ aws ec2 describe-security-groups --output json --group-ids ${DEFAULT_SG_ID} --re
   | xargs -0 -I {ip-permissions} aws ec2 revoke-security-group-egress --group-id ${DEFAULT_SG_ID} --ip-permissions '{ip-permissions}' --region ${AWS_REGION}
 
 cat ${AWS_RESOURCE_STATES_FILE_PATH} \
-  | rq -tJ \
+  | ./yj -tj \
   | jq ".vpc.default_security_group_id |=\"${DEFAULT_SG_ID}\"" \
-  | rq -jT \
+  | ./yj -jt \
   | tee ${AWS_RESOURCE_STATES_FILE_PATH}
