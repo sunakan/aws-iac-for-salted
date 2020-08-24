@@ -2,7 +2,9 @@
 ################################################################################
 # Overview
 # - Create route table
-# - Associate route table to vpc subnet
+# - Associate route table to internet gateway
+# - Associate route table to public subnet
+# - Modify subnet attribute(map public ip on launch for EC2 instance)
 #
 # Required command tools
 # - aws
@@ -63,11 +65,13 @@ export AWS_DEFAULT_OUTPUT="json"
 export AWS_DEFAULT_REGION=$(echo ${INPUT} | jq --raw-output '.region')
 
 ################################################################################
-# メイン
+# Main
 ################################################################################
-aws ec2 create-route-table --vpc-id ${VPC_ID} \
-  | jq '.RouteTable.RouteTableId' \
-  | xargs -I {route-table-id} aws ec2 create-route --route-table-id {route-table-id} --destination-cidr-block 0.0.0.0/0 --gateway-id ${INTERNET_GATEWAY_ID}
-#readonly PUBLIC_SUBNET_IDS=$(echo ${INPUT} | jq '.vpc_public_subnets.subnets[].subnet_id' | jq --slurp --compact-output)
-#aws ec2 associate-route-table  --subnet-id subnet-xxxxxx --route-table-id rtb-xxxxxx
-#aws ec2 modify-subnet-attribute --subnet-id subnet-xxxxxx --map-public-ip-on-launch
+readonly route_table_id=$(aws ec2 create-route-table --vpc-id ${VPC_ID} --tag-specifications "ResourceType=route-table,Tags=[{Key=Name,Value=${CUSTOM_ROUTE_TABLE_NAME}}]" | jq --raw-output '.RouteTable.RouteTableId')
+aws ec2 create-route --route-table-id ${route_table_id} --destination-cidr-block 0.0.0.0/0 --gateway-id ${INTERNET_GATEWAY_ID} > /dev/null
+echo ${INPUT} | jq --raw-output '.vpc_public_subnets.subnets[].subnet_id' | while read subnet_id; do
+  aws ec2 associate-route-table --subnet-id ${subnet_id} --route-table-id ${route_table_id} > /dev/null
+  aws ec2 modify-subnet-attribute --subnet-id ${subnet_id} --map-public-ip-on-launch > /dev/null
+done
+
+echo ${INPUT} | jq ".custom_route_table |= .+ {\"custom_route_table_id\": \"${route_table_id}\"}"
