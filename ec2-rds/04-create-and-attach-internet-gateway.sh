@@ -1,9 +1,8 @@
 #!/bin/sh
 ################################################################################
 # Overview
-# - Delete default security group's rules
-#   - Delete default security group's IpPermissions
-#   - Delete default security group's IpPermissionsEgress
+# - Create internet gateway
+# - Attach internet gateway to VPC
 #
 # 必須コマンド
 # - aws
@@ -14,19 +13,12 @@
 #   "region": "ap-northeast-1",
 #   "vpc": {
 #     "vpc_id": "vpc-xxxxxxx"
+#   },
+#   "internet_gateway": {
+#     "name": "asahi-gateway"
 #   }
 # }
 #
-# Output (format: json)
-# ----
-# INPUT_JSON + \
-# {
-#   "vpc": {
-#     "default_security_group_id": "sg-xxxxxxx"
-#   }
-# }
-# ----
-
 ################################################################################
 
 set -eu
@@ -40,7 +32,7 @@ readonly INPUT
 # Variables
 ################################################################################
 readonly VPC_ID=$(echo ${INPUT} | jq --raw-output '.vpc.vpc_id')
-readonly DEFAULT_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=${VPC_ID}" | jq --raw-output '.SecurityGroups[] | select(.GroupName = "default") | .GroupId')
+readonly INTERNET_GATEWAY_NAME=$(echo ${INPUT} | jq --raw-output '.internet_gateway.name')
 
 ################################################################################
 # Environment variables
@@ -52,14 +44,11 @@ export AWS_DEFAULT_REGION=$(echo ${INPUT} | jq --raw-output '.region')
 ################################################################################
 # Main
 ################################################################################
-aws ec2 describe-security-groups --group-ids ${DEFAULT_SECURITY_GROUP_ID} \
-  | jq --raw-output --compact-output '.SecurityGroups[].IpPermissions' \
-  | awk '$0!="[]"' \
-  | xargs -0 -I {ip-permissions} aws ec2 revoke-security-group-ingress --group-id ${DEFAULT_SECURITY_GROUP_ID} --ip-permissions '{ip-permissions}'
-
-aws ec2 describe-security-groups --group-ids ${DEFAULT_SECURITY_GROUP_ID} \
-  | jq --raw-output --compact-output '.SecurityGroups[].IpPermissionsEgress' \
-  | awk '$0!="[]"' \
-  | xargs -0 -I {ip-permissions} aws ec2 revoke-security-group-egress --group-id ${DEFAULT_SECURITY_GROUP_ID} --ip-permissions '{ip-permissions}'
-
-echo ${INPUT} | jq ".vpc.default_security_group_id |=\"${DEFAULT_SECURITY_GROUP_ID}\""
+readonly internet_gateways=$(aws ec2 describe-internet-gateways --filters Name=attachment.vpc-id,Values=${VPC_ID} | jq --compact-output '.InternetGateways')
+if [ "${internet_gateways}" = "[]" ]; then
+  aws ec2 create-internet-gateway --tag-specifications "ResourceType=internet-gateway,Tags=[{Key=Name,Value=${INTERNET_GATEWAY_NAME}}]" \
+    | jq '.InternetGateway.InternetGatewayId' \
+    | xargs -I {igw-id} aws ec2 attach-internet-gateway --vpc-id ${VPC_ID} --internet-gateway-id {igw-id}
+fi
+readonly internet_gateway_id=$(aws ec2 describe-internet-gateways --filters Name=attachment.vpc-id,Values=${VPC_ID} | jq '.InternetGateways[].InternetGatewayId')
+echo ${INPUT} | jq ".internet_gateway |= .+ {\"internet_gateway_id\": ${internet_gateway_id}}"

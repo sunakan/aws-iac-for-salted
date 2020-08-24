@@ -10,10 +10,10 @@
 # Required input properties (format: json)
 # ----
 # {
-#   "region": string(ex: "ap-northeast-1"),
+#   "region": "ap-northeast-1",
 #   "vpc": {
-#     "name": string(ex: "asahi"),
-#     "cidr": string(ex: "192.168.0.0/16")
+#     "name": "asahi",
+#     "cidr": "192.168.0.0/16"
 #   }
 # }
 # ----
@@ -26,18 +26,9 @@
 #     "vpc_id": "vpc-xxx"
 # }
 # ----
-#
-# How to run
-# $ cat input.json | sh 01-up-vpc.sh
 ################################################################################
 
 set -eu
-################################################################################
-# Environment variables
-################################################################################
-export AWS_PAGER=""
-export AWS_DEFAULT_OUTPUT="json"
-
 ################################################################################
 # Input
 ################################################################################
@@ -49,6 +40,13 @@ readonly INPUT
 ################################################################################
 readonly VPC_NAME=$(echo ${INPUT} | jq --raw-output '.vpc.name')
 readonly VPC_CIDR=$(echo ${INPUT} | jq --raw-output '.vpc.cidr')
+
+################################################################################
+# Environment variables
+################################################################################
+export AWS_PAGER=""
+export AWS_DEFAULT_OUTPUT="json"
+export AWS_DEFAULT_REGION=$(echo ${INPUT} | jq --raw-output '.region')
 
 ################################################################################
 # Main
