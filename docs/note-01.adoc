@@ -1,6 +1,8 @@
-== ノート 01
+== yj
 
-.hello
+link:
+
+.yjのインストール
 ----
-$ echo hello
+$ make install-yj
 ----

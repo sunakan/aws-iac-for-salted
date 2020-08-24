@@ -3,7 +3,7 @@
 # Overview
 # - Create subnet for public
 #
-# Required command
+# Required command tools
 # - aws
 # - jq
 #

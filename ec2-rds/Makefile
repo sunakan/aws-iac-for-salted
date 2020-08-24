@@ -11,7 +11,7 @@ output-04.toml: output-03.toml
 	cat output-03.toml | ./yj -tj | sh 04-create-and-attach-internet-gateway.sh | ./yj -jt 1> output-04.toml
 
 output-05.toml: output-04.toml
-	cat output-04.toml | ./yj -tj | sh 05-
+	cat output-04.toml | ./yj -tj | sh 05-create-and-associate-route-table.sh
 
 
 

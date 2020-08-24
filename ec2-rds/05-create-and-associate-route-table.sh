@@ -1,43 +1,73 @@
+#!/bin/sh
 ################################################################################
-# 概要
-# - インターネットゲートウェイの作成
-# - インターネットゲートウェイをVPCにアタッチ
-# - インターネットゲートウェイのigw-idを記録
+# Overview
+# - Create route table
+# - Associate route table to vpc subnet
 #
-# 必須コマンド
+# Required command tools
 # - aws
-# - yj
 # - jq
 #
-# 実行方法
-# $ sh 05-setup-route-table.sh ./variables.toml
+# Required input properties example (format: json)
+# ----
+# {
+#   "region": "ap-northeast-1",
+#   "vpc": {
+#     "vpc_id": "vpc-xxxxxxx"
+#   },
+#   "internet_gateway" {
+#     "internet_gateway_id": "igw-xxxxxx"
+#   },
+#   "custom_route_table": {
+#     "name": "asahi-route-table"
+#   },
+#   "vpc_public_subnets": {
+#     "subnets": [
+#       {"subnet_id": "subnet-xxxxxx"},
+#       ...
+#     ]
+#   }
+# }
+# ----
 #
-# 補足：メイン以下でよくわからなくなった場合
-#   - 最終行をコメントアウトして実行するとわかる
+# Output (format: json)
+# ----
+# INPUT_JSON + \
+# {
+#   "custom_route_table": {
+#     "route_table_id": "-xxxxxx"
+#   }
+# }
+# ----
 ################################################################################
 
+set -eu
 ################################################################################
-# 環境変数
+# Input
+################################################################################
+read INPUT
+readonly INPUT
+
+################################################################################
+# Variables
+################################################################################
+readonly VPC_ID=$(echo ${INPUT} | jq --raw-output '.vpc.vpc_id')
+readonly CUSTOM_ROUTE_TABLE_NAME=$(echo ${INPUT} | jq --raw-output '.custom_route_table.name')
+readonly INTERNET_GATEWAY_ID=$(echo ${INPUT} | jq --raw-output '.internet_gateway.internet_gateway_id')
+
+################################################################################
+# Environment variables
 ################################################################################
 export AWS_PAGER=""
-
-################################################################################
-# 変数
-################################################################################
-readonly VARIABLES_FILE_PATH=$1
-readonly AWS_RESOURCE_STATES_FILE_PATH=$(cat ${VARIABLES_FILE_PATH} | ./yj -tj | jq --raw-output '.aws_resource_states_file_path')
-
-readonly AWS_REGION=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}  | ./yj -tj | jq --raw-output '.region')
-readonly VPC_ID=$(cat ${AWS_RESOURCE_STATES_FILE_PATH}      | ./yj -tj | jq --raw-output '.vpc.vpc_id')
-
-################################################################################
-# チェック
-################################################################################
+export AWS_DEFAULT_OUTPUT="json"
+export AWS_DEFAULT_REGION=$(echo ${INPUT} | jq --raw-output '.region')
 
 ################################################################################
 # メイン
 ################################################################################
-#aws ec2 create-route-table --vpc-id vpc-xxxxxxx
-#aws ec2 create-route --route-table-id rtb-xxxxxx --destination-cidr-block 0.0.0.0/0 --gateway-id igw-xxxxxx
+aws ec2 create-route-table --vpc-id ${VPC_ID} \
+  | jq '.RouteTable.RouteTableId' \
+  | xargs -I {route-table-id} aws ec2 create-route --route-table-id {route-table-id} --destination-cidr-block 0.0.0.0/0 --gateway-id ${INTERNET_GATEWAY_ID}
+#readonly PUBLIC_SUBNET_IDS=$(echo ${INPUT} | jq '.vpc_public_subnets.subnets[].subnet_id' | jq --slurp --compact-output)
 #aws ec2 associate-route-table  --subnet-id subnet-xxxxxx --route-table-id rtb-xxxxxx
 #aws ec2 modify-subnet-attribute --subnet-id subnet-xxxxxx --map-public-ip-on-launch

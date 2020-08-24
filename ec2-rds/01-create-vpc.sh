@@ -3,7 +3,7 @@
 # Overview
 # - Create VPC
 #
-# Required command
+# Required input properties example (format: json)
 # - aws
 # - jq
 #

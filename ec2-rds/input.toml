@@ -21,3 +21,6 @@ az   = "ap-northeast-1c"
 name = "asahi-public-d"
 cidr = "172.27.2.0/24"
 az   = "ap-northeast-1d"
+
+[custom_route_table]
+name = "asahi-route-table"

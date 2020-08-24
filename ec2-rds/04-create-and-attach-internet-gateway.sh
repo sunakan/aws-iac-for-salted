@@ -4,11 +4,12 @@
 # - Create internet gateway
 # - Attach internet gateway to VPC
 #
-# 必須コマンド
+# Required command tools
 # - aws
 # - jq
 #
 # Required input properties example (format: json)
+# ----
 # {
 #   "region": "ap-northeast-1",
 #   "vpc": {
@@ -18,7 +19,17 @@
 #     "name": "asahi-gateway"
 #   }
 # }
+# ----
 #
+# Output (format: json)
+# ----
+# INPUT_JSON + \
+# {
+#   "internet_gateway": {
+#     "internet_gateway_id": "igw-xxxxxx"
+#   }
+# }
+# ----
 ################################################################################
 
 set -eu

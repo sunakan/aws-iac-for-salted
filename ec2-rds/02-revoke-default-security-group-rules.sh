@@ -5,7 +5,7 @@
 #   - Delete default security group's IpPermissions
 #   - Delete default security group's IpPermissionsEgress
 #
-# 必須コマンド
+# Required input properties example (format: json)
 # - aws
 # - jq
 #
