@@ -26,8 +26,13 @@ az   = "ap-northeast-1d"
 name = "asahi-route-table"
 
 [ssh_key_pair]
-name = "asahi-key"
+name            = "asahi-key"
 secret_key_path = "./asahi-key.pem"
+
+[custom_security_group]
+name = "asahi-security-group"
+group_name = "asahi-security-group"
+description = "For asahi only. Do not use for other purpose to make it easier to delete it."
 
 #$ aws ec2 describe-images --region ap-northeast-1 --query 'reverse(sort_by(Images, &CreationDate))[:1]' --owners amazon --filters 'Name=name,Values=amzn2-ami-hvm-2.0.*-x86_64-gp2'
 [ec2]

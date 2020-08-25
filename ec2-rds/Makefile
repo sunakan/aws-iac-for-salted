@@ -16,13 +16,15 @@ output-05.toml: output-04.toml
 output-06.toml: output-05.toml
 	cat output-05.toml | ./yj -tj | sh 06-create-ssh-key-pair.sh | ./yj -jt 1> output-06.toml
 
-
-
+output-07.toml: output-06.toml
+	cat output-06.toml | ./yj -tj | sh 07-create-security-group.sh | ./yj -jt 1> output-07.toml
 
 
 
 .PHONY: cleanup
 cleanup:
+	@echo '---------------------------------------------[delete custom security group]'
+	aws ec2 describe-security-groups | jq '.SecurityGroups[] | select(.GroupName != "default") | .GroupId' | xargs -I {group-id} aws ec2 delete-security-group --group-id {group-id}
 	@echo '---------------------------------------------[delete key pairs]'
 	aws ec2 describe-key-pairs | jq '.KeyPairs[].KeyPairId' | xargs -I {key-pair-id} aws ec2 delete-key-pair --key-pair-id {key-pair-id}
 	@echo '---------------------------------------------[delete route table associations]'
@@ -39,3 +41,10 @@ cleanup:
 	@echo '---------------------------------------------[delete vpcs]'
 	aws ec2 describe-vpcs | jq '.Vpcs[].VpcId' | xargs -I {vpc-id} aws ec2 delete-vpc --vpc-id {vpc-id}
 	rm -f output*.toml
+
+.PHONY: latest-ami
+latest-ami:
+	@aws ec2 describe-images \
+		--query 'reverse(sort_by(Images, &CreationDate))[:1]' \
+		--owners amazon \
+		--filters 'Name=name,Values=amzn2-ami-hvm-2.0.*-x86_64-gp2'
