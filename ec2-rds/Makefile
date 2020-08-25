@@ -14,7 +14,7 @@ output-05.toml: output-04.toml
 	cat output-04.toml | ./yj -tj | sh 05-create-and-associate-route-table.sh | ./yj -jt 1> output-05.toml
 
 output-06.toml: output-05.toml
-	cat output-05.toml | ./yj -tj | sh 06-create-ssh-key-pair.sh #| ./yj -jt 1> output-06.toml
+	cat output-05.toml | ./yj -tj | sh 06-create-ssh-key-pair.sh | ./yj -jt 1> output-06.toml
 
 
 

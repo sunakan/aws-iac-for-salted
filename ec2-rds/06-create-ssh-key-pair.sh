@@ -51,10 +51,12 @@ export AWS_DEFAULT_REGION=$(echo ${INPUT} | jq --raw-output '.region')
 ################################################################################
 # Main
 ################################################################################
-readonly key_pair_id=$(aws ec2 describe-key-pairs --key-names ${SSH_KEY_PAIR_NAME} --query 'KeyPairs[0].KeyPairId' 2> /dev/null || echo 'nothing')
-if [ "${key_pair_id}" = "nothing" ]; then
+set +e
+aws ec2 describe-key-pairs --key-names ${SSH_KEY_PAIR_NAME} > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+  set -e
   aws ec2 create-key-pair --key-name ${SSH_KEY_PAIR_NAME} --query 'KeyMaterial' --output text > ${SECRET_KEY_PATH}
-  echo $(aws ec2 describe-key-pairs --key-names ${SSH_KEY_PAIR_NAME} --query 'KeyPairs[0].KeyPairId')
-else
-  echo ${key_pair_id}
 fi
+set -e
+readonly key_pair_id=$(aws ec2 describe-key-pairs --key-names ${SSH_KEY_PAIR_NAME} | jq '.KeyPairs[0].KeyPairId')
+echo ${INPUT} | jq ".ssh_key_pair |= .+ {\"key_pair_id\": ${key_pair_id}}"
