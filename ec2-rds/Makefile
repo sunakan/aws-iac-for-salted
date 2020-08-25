@@ -23,7 +23,7 @@ cleanup:
 	@echo '---------------------------------------------[delete route table associations]'
 	aws ec2 describe-route-tables --filter Name=association.main,Values=false | jq '.RouteTables[].Associations[].RouteTableAssociationId' | xargs -I {association-id} aws ec2 disassociate-route-table --association-id {association-id}
 	@echo '---------------------------------------------[delete route tables]'
-	aws ec2 describe-route-tables | jq '.RouteTables[]' | jq 'select((.Associations[].Main==false) or (.Associations | length == 0))' | jq --raw-output '.RouteTableId' | uniq | xargs -I {route-table-id} aws ec2 delete-route-table --route-table-id {route-table-id}
+	aws ec2 describe-route-tables | jq '.RouteTables[]' | jq 'select((.Associations | length == 0) or (.Associations[].Main==false))' | jq --raw-output '.RouteTableId' | uniq | xargs -I {route-table-id} aws ec2 delete-route-table --route-table-id {route-table-id}
 	@echo '---------------------------------------------[detach internet gateways]'
 	export AWS_PAGER="" \
 	&& ( aws ec2 describe-internet-gateways | jq '.InternetGateways[] | select(.Attachments[].VpcId != null) | .Attachments[].VpcId, .InternetGatewayId' | xargs -n 2 sh -c 'aws ec2 detach-internet-gateway --vpc-id $$0 --internet-gateway-id $$1 || echo done' )

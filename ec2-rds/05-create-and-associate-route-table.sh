@@ -68,12 +68,12 @@ export AWS_DEFAULT_REGION=$(echo ${INPUT} | jq --raw-output '.region')
 # Main
 ################################################################################
 readonly route_table_count=$(aws ec2 describe-route-tables --filters Name=vpc-id,Values=${VPC_ID} | jq '.RouteTables | length')
-if [ ${route_table_count} -lt 1 ]; then
-  local readonly route_table_id=$(aws ec2 create-route-table --vpc-id ${VPC_ID} --tag-specifications "ResourceType=route-table,Tags=[{Key=Name,Value=${CUSTOM_ROUTE_TABLE_NAME}}]" | jq --raw-output '.RouteTable.RouteTableId')
-  aws ec2 create-route --route-table-id ${route_table_id} --destination-cidr-block 0.0.0.0/0 --gateway-id ${INTERNET_GATEWAY_ID} > /dev/null
+if [ ${route_table_count} -eq 1 ]; then
+  readonly created_route_table_id=$(aws ec2 create-route-table --vpc-id ${VPC_ID} --tag-specifications "ResourceType=route-table,Tags=[{Key=Name,Value=${CUSTOM_ROUTE_TABLE_NAME}}]" | jq --raw-output '.RouteTable.RouteTableId')
+  aws ec2 create-route --route-table-id ${created_route_table_id} --destination-cidr-block 0.0.0.0/0 --gateway-id ${INTERNET_GATEWAY_ID} > /dev/null
   # associate to each subnet
   echo ${INPUT} | jq --raw-output '.vpc_public_subnets.subnets[].subnet_id' | while read subnet_id; do
-    aws ec2 associate-route-table --subnet-id ${subnet_id} --route-table-id ${route_table_id} > /dev/null
+    aws ec2 associate-route-table --subnet-id ${subnet_id} --route-table-id ${created_route_table_id} > /dev/null
     aws ec2 modify-subnet-attribute --subnet-id ${subnet_id} --map-public-ip-on-launch > /dev/null
   done
 fi
