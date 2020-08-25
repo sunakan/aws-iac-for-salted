@@ -82,7 +82,7 @@ set -e
 # VPC_SUBNETSの情報群にsubnet_idを追加、nameの更新してAWS_RESOURCE_STATES_FILEへ統合させる
 # 最初はaという変数が未定義なので、-uのままだと怒られるため解除する
 set +u
-export TEMP_INPUT=${INPUT} \
+export TEMP_INPUT="${INPUT}" \
 && echo ${VPC_SUBNETS} | jq --compact-output '.[]' | while read subnet_info; do
   cidr=$(echo ${subnet_info} | jq '.cidr')
   aws_subnet_info=$(aws ec2 describe-subnets --filters Name=vpc-id,Values=${VPC_ID} --filters Name=cidr-block,Values=${cidr} | jq --compact-output '.Subnets[0]')
