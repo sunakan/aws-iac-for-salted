@@ -38,8 +38,8 @@ readonly INPUT
 ################################################################################
 # Variables
 ################################################################################
-SSH_KEY_PAIR_NAME=$(echo ${INPUT} | jq --raw-output '.ssh_key_pair.name')
-SECRET_KEY_PATH=$(echo ${INPUT} | jq --raw-output '.ssh_key_pair.secret_key_path')
+readonly SSH_KEY_PAIR_NAME=$(echo ${INPUT} | jq --raw-output '.ssh_key_pair.name')
+readonly SECRET_KEY_PATH=$(echo ${INPUT} | jq --raw-output '.ssh_key_pair.secret_key_path')
 
 ################################################################################
 # Environment variables
