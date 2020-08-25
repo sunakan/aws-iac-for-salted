@@ -13,6 +13,9 @@ output-04.toml: output-03.toml
 output-05.toml: output-04.toml
 	cat output-04.toml | ./yj -tj | sh 05-create-and-associate-route-table.sh | ./yj -jt 1> output-05.toml
 
+output-06.toml: output-05.toml
+	cat output-05.toml | ./yj -tj | sh 06-create-ssh-key-pair.sh #| ./yj -jt 1> output-06.toml
+
 
 
 
@@ -20,6 +23,8 @@ output-05.toml: output-04.toml
 
 .PHONY: cleanup
 cleanup:
+	@echo '---------------------------------------------[delete key pairs]'
+	aws ec2 describe-key-pairs | jq '.KeyPairs[].KeyPairId' | xargs -I {key-pair-id} aws ec2 delete-key-pair --key-pair-id {key-pair-id}
 	@echo '---------------------------------------------[delete route table associations]'
 	aws ec2 describe-route-tables --filter Name=association.main,Values=false | jq '.RouteTables[].Associations[].RouteTableAssociationId' | xargs -I {association-id} aws ec2 disassociate-route-table --association-id {association-id}
 	@echo '---------------------------------------------[delete route tables]'

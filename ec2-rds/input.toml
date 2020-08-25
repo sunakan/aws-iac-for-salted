@@ -24,3 +24,7 @@ az   = "ap-northeast-1d"
 
 [custom_route_table]
 name = "asahi-route-table"
+
+[ssh_key_pair]
+name = "asahi-key"
+secret_key_path = "./asahi-key.pem"
