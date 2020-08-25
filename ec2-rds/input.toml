@@ -28,3 +28,8 @@ name = "asahi-route-table"
 [ssh_key_pair]
 name = "asahi-key"
 secret_key_path = "./asahi-key.pem"
+
+#$ aws ec2 describe-images --region ap-northeast-1 --query 'reverse(sort_by(Images, &CreationDate))[:1]' --owners amazon --filters 'Name=name,Values=amzn2-ami-hvm-2.0.*-x86_64-gp2'
+[ec2]
+name = "asahi-instance"
+ami  = "ami-0cc75a8978fbbc969"
