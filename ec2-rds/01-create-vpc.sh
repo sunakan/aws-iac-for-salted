@@ -51,8 +51,5 @@ export AWS_DEFAULT_REGION=$(echo ${INPUT} | jq --raw-output '.region')
 ################################################################################
 # Main
 ################################################################################
-aws ec2 create-vpc \
-  --cidr-block ${VPC_CIDR} \
-  --tag-specifications "ResourceType=vpc,Tags=[{Key=Name,Value=${VPC_NAME}}]" \
-  | jq '.Vpc.VpcId' \
-  | xargs -I {vpc-id} sh -c "echo '${INPUT}' | jq '.vpc.vpc_id |= \"{vpc-id}\"'"
+readonly vpc_id=$(aws ec2 create-vpc --cidr-block ${VPC_CIDR} --tag-specifications "ResourceType=vpc,Tags=[{Key=Name,Value=${VPC_NAME}}]" | jq '.Vpc.VpcId')
+echo ${INPUT} | jq ".vpc.vpc_id |= ${vpc_id}"
