@@ -17,10 +17,16 @@ output-06.toml: output-05.toml
 	cat output-05.toml | ./yj -tj | sh 06-create-security-group.sh | ./yj -jt 1> output-06.toml
 
 output-07.toml: output-06.toml
-	cat output-06.toml | ./yj -tj | sh 07-run-ec2.sh | ./yj -jt 1> output-07.toml
+	cat output-06.toml | ./yj -tj | sh 07-create-primitive-iam-role-for-instance-profile.sh | ./yj -jt 1> output-07.toml
 
 output-08.toml: output-07.toml
-	cat output-07.toml | ./yj -tj | sh 08-create-and-attach-iam-role-to-ec2-for-ssm.sh #| ./yj -jt 1> output-07.toml
+	cat output-07.toml | ./yj -tj | sh 08-create-iam-policy-and-attach-to-role.sh | ./yj -jt 1> output-08.toml
+
+#	cat output-06.toml | ./yj -tj | sh 07-run-ec2.sh | ./yj -jt 1> output-07.toml
+#output-08.toml: output-07.toml
+#	cat output-07.toml | ./yj -tj | sh 08-create-primitive-iam-role-and-attach-to-ec2.sh | ./yj -jt 1> output-08.toml
+#output-09.toml: output-08.toml
+#	cat output-08.toml | ./yj -tj | sh 08-create-primitive-iam-role-and-attach-to-ec2-as-instance-profile.sh #| ./yj -jt 1> output-09.toml
 
 
 

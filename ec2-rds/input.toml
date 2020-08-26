@@ -34,16 +34,19 @@ name = "asahi-security-group"
 group_name = "asahi-security-group"
 description = "For asahi only. Do not use for other purpose to make it easier to delete it."
 
+[ec2_instance_profile]
+name = "asahi-instance-profile"
+
+[ec2_instance_profile.iam_role]
+name                         = "asahi-ec2-instance-role"
+assume_role_policy_file_path = "./ec2-role-trust-policy.json"
+
+[[ec2_instance_profile.iam_role.attached_iam_policies]]
+name                 = "asahi-minimal-ssm-iam-policy"
+iam_policy_file_path = "./asahi-minimal-ssm-iam-policy.json"
+
 #$ aws ec2 describe-images --region ap-northeast-1 --query 'reverse(sort_by(Images, &CreationDate))[:1]' --owners amazon --filters 'Name=name,Values=amzn2-ami-hvm-2.0.*-x86_64-gp2'
 [ec2]
 name          = "asahi-instance"
 ami           = "ami-0cc75a8978fbbc969"
 instance_type = "t2.micro"
-
-[ec2.iam_role]
-name                         = "asahi-role"
-assume_role_policy_file_path = "./asahi-assume-role-policy-document.json"
-
-[[ec2.iam_role.attached_iam_policies]]
-iam_policy_name      = "asahi-minimal-ssm-iam-policy"
-iam_policy_file_path = "./asahi-minimal-ssm-iam-policy.json"
