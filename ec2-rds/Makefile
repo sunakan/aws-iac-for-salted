@@ -14,13 +14,12 @@ output-05.toml: output-04.toml
 	cat output-04.toml | ./yj -tj | sh 05-create-and-associate-route-table.sh | ./yj -jt 1> output-05.toml
 
 output-06.toml: output-05.toml
-	cat output-05.toml | ./yj -tj | sh 06-create-ssh-key-pair.sh | ./yj -jt 1> output-06.toml
+	cat output-05.toml | ./yj -tj | sh 06-create-security-group.sh | ./yj -jt 1> output-06.toml
 
 output-07.toml: output-06.toml
-	cat output-06.toml | ./yj -tj | sh 07-create-security-group.sh | ./yj -jt 1> output-07.toml
+	cat output-06.toml | ./yj -tj | sh 07-run-ec2.sh | ./yj -jt 1> output-07.toml
 
-output-08.toml: output-07.toml
-	cat output-07.toml | ./yj -tj | sh 08-run-ec2.sh | ./yj -jt 1> output-08.toml
+#output-08.toml: output-07.toml
 
 
 
@@ -53,3 +52,8 @@ latest-ami:
 		--query 'reverse(sort_by(Images, &CreationDate))[:1]' \
 		--owners amazon \
 		--filters 'Name=name,Values=amzn2-ami-hvm-2.0.*-x86_64-gp2'
+
+.PHONY: ssm
+ssm: output-07.toml
+	$(eval EC2_INSTANCE_ID := $(shell cat output-07.toml | ./yj -tj | jq --raw-output '.ec2.instance_id'))
+	aws ssm start-session --target $(EC2_INSTANCE_ID)

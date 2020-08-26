@@ -25,9 +25,6 @@
 #   },
 #   "custom_security_group": {
 #     "security_group_id": "sg-xxxxxx"
-#   },
-#   "ssh_key_pair": {
-#     "key_name": "asahi-key"
 #   }
 # }
 # ----
@@ -76,7 +73,6 @@ if test -z "${ec2_instance_count}" || test ${ec2_instance_count} -eq 0; then
     --count 1 \
     --image-id ${AMI_ID} \
     --instance-type ${EC2_TYPE} \
-    --key-name ${KEY_NAME} \
     --security-group-ids ${SECURITY_GROUP_ID} \
     --subnet-id ${VPC_SUBNET_ID} \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${EC2_NAME}}]" > /dev/null
