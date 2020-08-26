@@ -19,10 +19,15 @@ output-06.toml: output-05.toml
 output-07.toml: output-06.toml
 	cat output-06.toml | ./yj -tj | sh 07-create-security-group.sh | ./yj -jt 1> output-07.toml
 
+output-08.toml: output-07.toml
+	cat output-07.toml | ./yj -tj | sh 08-run-ec2.sh | ./yj -jt 1> output-08.toml
+
 
 
 .PHONY: cleanup
 cleanup:
+	@echo '---------------------------------------------[delete ec2 instances]'
+	aws ec2 describe-instances --filter Name=instance-state-name,Values=[running,pending] | jq '.Reservations[].Instances[].InstanceId' | xargs -I {instance-id} aws ec2 terminate-instances --instance-ids {instance-id}
 	@echo '---------------------------------------------[delete custom security group]'
 	aws ec2 describe-security-groups | jq '.SecurityGroups[] | select(.GroupName != "default") | .GroupId' | xargs -I {group-id} aws ec2 delete-security-group --group-id {group-id}
 	@echo '---------------------------------------------[delete key pairs]'

@@ -36,5 +36,6 @@ description = "For asahi only. Do not use for other purpose to make it easier to
 
 #$ aws ec2 describe-images --region ap-northeast-1 --query 'reverse(sort_by(Images, &CreationDate))[:1]' --owners amazon --filters 'Name=name,Values=amzn2-ami-hvm-2.0.*-x86_64-gp2'
 [ec2]
-name = "asahi-instance"
-ami  = "ami-0cc75a8978fbbc969"
+name          = "asahi-instance"
+ami           = "ami-0cc75a8978fbbc969"
+instance_type = "t2.micro"
