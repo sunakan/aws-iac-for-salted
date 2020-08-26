@@ -58,3 +58,9 @@ latest-ami:
 ssm: output-07.toml
 	$(eval EC2_INSTANCE_ID := $(shell cat output-07.toml | ./yj -tj | jq --raw-output '.ec2.instance_id'))
 	aws ssm start-session --target $(EC2_INSTANCE_ID)
+
+asahi-minimal-ssm-iam-policy.json:
+	aws iam get-policy --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM \
+		| jq '.Policy.DefaultVersionId' \
+		| xargs -I {version} aws iam get-policy-version --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM --version-id {version} \
+		| jq '.PolicyVersion.Document' > asahi-minimal-ssm-iam-policy.json

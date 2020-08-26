@@ -41,4 +41,9 @@ ami           = "ami-0cc75a8978fbbc969"
 instance_type = "t2.micro"
 
 [ec2.iam_role]
-name = "asahi-role"
+name                         = "asahi-role"
+assume_role_policy_file_path = "./asahi-assume-role-policy-document.json"
+
+[[ec2.iam_role.attached_iam_policies]]
+iam_policy_name      = "asahi-minimal-ssm-iam-policy"
+iam_policy_file_path = "./asahi-minimal-ssm-iam-policy.json"
