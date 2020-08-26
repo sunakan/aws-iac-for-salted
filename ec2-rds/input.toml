@@ -39,3 +39,6 @@ description = "For asahi only. Do not use for other purpose to make it easier to
 name          = "asahi-instance"
 ami           = "ami-0cc75a8978fbbc969"
 instance_type = "t2.micro"
+
+[ec2.iam_role]
+name = "asahi-role"
