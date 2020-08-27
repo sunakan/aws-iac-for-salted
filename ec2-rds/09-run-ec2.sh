@@ -25,6 +25,9 @@
 #   },
 #   "custom_security_group": {
 #     "security_group_id": "sg-xxxxxx"
+#   },
+#   "ec2_instance_profile": {
+#     "name": "asahi-instance-profile"
 #   }
 # }
 # ----
@@ -34,7 +37,7 @@
 # INPUT_JSON + \
 # {
 #   "ec2": {
-#     "instance_id": "i-0ff68a3c6ce1c2dc2"
+#     "instance_id": "i-xxxxxx"
 #   }
 # }
 # ----
@@ -55,7 +58,7 @@ readonly EC2_TYPE=$(echo ${INPUT} | jq --raw-output '.ec2.instance_type')
 readonly EC2_NAME=$(echo ${INPUT} | jq --raw-output '.ec2.name')
 readonly VPC_SUBNET_ID=$(echo ${INPUT} | jq --raw-output '.vpc_public_subnets.subnets[0].subnet_id')
 readonly SECURITY_GROUP_ID=$(echo ${INPUT} | jq --raw-output '.custom_security_group.security_group_id')
-readonly KEY_NAME=$(echo ${INPUT} | jq --raw-output '.ssh_key_pair.name')
+readonly INSTANCE_PROFILE_NAME=$(echo ${INPUT} | jq --raw-output '.ec2_instance_profile.name')
 
 ################################################################################
 # Environment variables
@@ -75,6 +78,7 @@ if test -z "${ec2_instance_count}" || test ${ec2_instance_count} -eq 0; then
     --instance-type ${EC2_TYPE} \
     --security-group-ids ${SECURITY_GROUP_ID} \
     --subnet-id ${VPC_SUBNET_ID} \
+    --iam-instance-profile Name=${INSTANCE_PROFILE_NAME} \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${EC2_NAME}}]" > /dev/null
 fi
 

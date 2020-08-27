@@ -22,6 +22,9 @@ output-07.toml: output-06.toml
 output-08.toml: output-07.toml
 	cat output-07.toml | ./yj -tj | sh 08-create-iam-role-and-attach-to-instance-profile.sh | ./yj -jt 1> output-08.toml
 
+output-09.toml: output-08.toml
+	cat output-08.toml | ./yj -tj | sh 09-run-ec2.sh | ./yj -jt 1> output-09.toml
+
 
 
 
