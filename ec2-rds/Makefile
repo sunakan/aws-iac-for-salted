@@ -73,8 +73,8 @@ latest-ami:
 		--filters 'Name=name,Values=amzn2-ami-hvm-2.0.*-x86_64-gp2'
 
 .PHONY: ssm
-ssm: output-07.toml
-	$(eval EC2_INSTANCE_ID := $(shell cat output-07.toml | ./yj -tj | jq --raw-output '.ec2.instance_id'))
+ssm: output-10.toml
+	$(eval EC2_INSTANCE_ID := $(shell cat output-10.toml | ./yj -tj | jq --raw-output '.ec2.instance_id'))
 	aws ssm start-session --target $(EC2_INSTANCE_ID)
 
 asahi-minimal-ssm-iam-policy.json:
