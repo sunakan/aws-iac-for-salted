@@ -74,6 +74,7 @@ latest-ami:
 
 .PHONY: ssm
 ssm: output-10.toml
+	rm -f ~/.aws/cli/cache/*
 	$(eval EC2_INSTANCE_ID := $(shell cat output-10.toml | ./yj -tj | jq --raw-output '.ec2.instance_id'))
 	aws ssm start-session --target $(EC2_INSTANCE_ID)
 
@@ -82,3 +83,6 @@ asahi-minimal-ssm-iam-policy.json:
 		| jq '.Policy.DefaultVersionId' \
 		| xargs -I {version} aws iam get-policy-version --policy-arn arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM --version-id {version} \
 		| jq '.PolicyVersion.Document' > asahi-minimal-ssm-iam-policy.json
+
+update-iam-policy: output-10.toml
+	cat output-10.toml | ./yj -tj | jq --raw-output '.ec2_instance_profile.iam_role.attached_iam_policies[0].arn' | xargs -I {arn} aws iam create-policy-version --policy-arn {arn} --policy-document file://./asahi-minimal-ssm-iam-policy.json --set-as-default
