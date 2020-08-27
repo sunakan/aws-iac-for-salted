@@ -25,6 +25,10 @@ output-08.toml: output-07.toml
 output-09.toml: output-08.toml
 	cat output-08.toml | ./yj -tj | sh 09-run-ec2.sh | ./yj -jt 1> output-09.toml
 
+output-10.toml: output-09.toml
+	cat output-09.toml | ./yj -tj | sh 10-create-iam-policy-and-attach-to-role.sh | ./yj -jt 1> output-10.toml
+
+
 
 
 
