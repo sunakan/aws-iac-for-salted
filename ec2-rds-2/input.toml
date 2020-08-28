@@ -1,0 +1,85 @@
+[vpc]
+name = "asahi"
+cidr = "172.27.0.0/16"
+
+[internet_gateway]
+name = "asahi-internet-gateway"
+
+[[vpc_public_subnets.subnets]]
+name = "asahi-public-a"
+cidr = "172.27.0.0/24"
+az   = "ap-northeast-1a"
+
+[[vpc_public_subnets.subnets]]
+name = "asahi-public-c"
+cidr = "172.27.1.0/24"
+az   = "ap-northeast-1c"
+
+[[vpc_public_subnets.subnets]]
+name = "asahi-public-d"
+cidr = "172.27.2.0/24"
+az   = "ap-northeast-1d"
+
+[custom_route_table]
+name = "asahi-route-table"
+
+[ssh_key_pair]
+name            = "asahi-key"
+secret_key_path = "./asahi-key.pem"
+
+[custom_security_group]
+name = "asahi-security-group"
+group_name = "asahi-security-group"
+description = "For asahi only. Do not use for other purpose to make it easier to delete it."
+
+[ec2_instance_profile]
+name = "asahi-instance-profile"
+
+[ec2_instance_profile.iam_role]
+name                         = "asahi-ec2-instance-role"
+assume_role_policy_file_path = "./ec2-role-trust-policy.json"
+
+[[ec2_instance_profile.iam_role.attached_iam_policies]]
+name                 = "asahi-minimal-ssm-iam-policy"
+iam_policy_file_path = "./asahi-minimal-ssm-iam-policy.json"
+
+#$ aws ec2 describe-images --region ap-northeast-1 --query 'reverse(sort_by(Images, &CreationDate))[:1]' --owners amazon --filters 'Name=name,Values=amzn2-ami-hvm-2.0.*-x86_64-gp2'
+[ec2]
+name          = "asahi-instance"
+ami           = "ami-0cc75a8978fbbc969"
+instance_type = "t2.micro"
+
+[[vpc_database_subnets.subnets]]
+name = "asahi-database-a"
+cidr = "172.27.140.0/24"
+az   = "ap-northeast-1a"
+
+[[vpc_database_subnets.subnets]]
+name = "asahi-database-c"
+cidr = "172.27.141.0/24"
+az   = "ap-northeast-1c"
+
+[[vpc_database_subnets.subnets]]
+name = "asahi-database-d"
+cidr = "172.27.142.0/24"
+az   = "ap-northeast-1d"
+
+[custom_security_group_for_database]
+name        = "asahi-security-group-for-database"
+group_name  = "asahi-security-group-for-database"
+description = "For asahi only. Do not use for other purpose to make it easier to delete it."
+
+[database_subnet_group]
+name       = "asahi-db-subnet-group"
+group_name = "asahi-db-subnet-group"
+description = "For asahi db subnet group"
+
+[database]
+name            = "asahi-db"
+instance_class  = "db.t2.micro"
+engine          = "MySQL"
+engine_version  = "5.7.30"
+master_username = "root"
+master_password = "pasuwa-do"
+backup_retention_period = 3
+allocated_storage = 20
