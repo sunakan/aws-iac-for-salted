@@ -67,29 +67,26 @@ export AWS_DEFAULT_REGION=$(echo ${INPUT} | jq --raw-output '.region')
 ################################################################################
 # Main
 ################################################################################
-set +e
 echo ${VPC_SUBNETS} | jq --compact-output '.[]' | while read subnet_info; do
   cidr=$(echo ${subnet_info} | jq --raw-output '.cidr')
   az=$(echo ${subnet_info}   | jq --raw-output '.az')
   name=$(echo ${subnet_info} | jq --raw-output '.name')
-  subnet_id=$(aws ec2 describe-subnets --filters Name=vpc-id,Values=${VPC_ID} --filters Name=cidr-block,Values=${cidr} | jq --raw-output '.Subnets[].SubnetId')
-  if [ "${subnet_id}" = "" ]; then
+  aws_subnet_count=$(aws ec2 describe-subnets --filters Name=cidr-block,Values=${cidr} Name=vpc-id,Values=${VPC_ID} | jq --raw-output '.Subnets | length')
+  if [ ${aws_subnet_count} -eq 0 ]; then
     aws ec2 create-subnet --vpc-id ${VPC_ID} --cidr-block ${cidr} --availability-zone ${az} --tag-specifications "ResourceType=subnet,Tags=[{Key=Name,Value=${name}}]" > /dev/null
   fi
 done
-set -e
 
-# VPC_SUBNETSの情報群にsubnet_idを追加、nameの更新してAWS_RESOURCE_STATES_FILEへ統合させる
-# 最初はaという変数が未定義なので、-uのままだと怒られるため解除する
-set +u
 export TEMP_INPUT="${INPUT}" \
 && echo ${VPC_SUBNETS} | jq --compact-output '.[]' | while read subnet_info; do
   cidr=$(echo ${subnet_info} | jq '.cidr')
-  aws_subnet_info=$(aws ec2 describe-subnets --filters Name=vpc-id,Values=${VPC_ID} --filters Name=cidr-block,Values=${cidr} | jq --compact-output '.Subnets[0]')
+  aws_subnet_info=$(aws ec2 describe-subnets --filters Name=vpc-id,Values=${VPC_ID} Name=cidr-block,Values=${cidr} | jq --compact-output '.Subnets[0]')
   name=$(echo ${aws_subnet_info} | jq '.Tags[] | select(.Key == "Name") | .Value')
   subnet_id=$(echo ${aws_subnet_info} | jq '.SubnetId')
   subnet_info=$(echo ${subnet_info} | jq ".name |= ${name}" | jq --compact-output ". |= .+ {\"subnet_id\": ${subnet_id}}")
+  set +u
   a=${a},${subnet_info}
+  set -u
   echo ${a}
 done \
   | tail -n 1 \
