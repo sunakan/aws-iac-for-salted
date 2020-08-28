@@ -65,3 +65,8 @@ az   = "ap-northeast-1c"
 name = "asahi-database-d"
 cidr = "172.27.142.0/24"
 az   = "ap-northeast-1d"
+
+[custom_security_group_for_database]
+name        = "asahi-security-group-for-database"
+group_name  = "asahi-security-group-for-database"
+description = "For asahi only. Do not use for other purpose to make it easier to delete it."

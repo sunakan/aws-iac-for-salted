@@ -31,7 +31,8 @@ output-10.toml: output-09.toml
 output-11.toml: output-10.toml
 	cat output-10.toml | ./yj -tj | sh 11-create-subnet-for-database.sh | ./yj -jt 1> output-11.toml
 
-# aws ec2 describe-subnets | jq '.Subnets[] | {name: .Tags[].Value, vpc_id: .VpcId, subnet_id: .SubnetId, cidr: .CidrBlock, az: .AvailabilityZone}'
+output-12.toml: output-11.toml
+	cat output-11.toml | ./yj -tj | sh 12-create-security-group-for-database.sh | ./yj -jt 1> output-12.toml
 
 
 
