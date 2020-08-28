@@ -50,3 +50,18 @@ iam_policy_file_path = "./asahi-minimal-ssm-iam-policy.json"
 name          = "asahi-instance"
 ami           = "ami-0cc75a8978fbbc969"
 instance_type = "t2.micro"
+
+[[vpc_database_subnets.subnets]]
+name = "asahi-database-a"
+cidr = "172.27.140.0/24"
+az   = "ap-northeast-1a"
+
+[[vpc_database_subnets.subnets]]
+name = "asahi-database-c"
+cidr = "172.27.141.0/24"
+az   = "ap-northeast-1c"
+
+[[vpc_database_subnets.subnets]]
+name = "asahi-database-d"
+cidr = "172.27.142.0/24"
+az   = "ap-northeast-1d"

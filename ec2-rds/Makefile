@@ -28,17 +28,12 @@ output-09.toml: output-08.toml
 output-10.toml: output-09.toml
 	cat output-09.toml | ./yj -tj | sh 10-create-iam-policy-and-attach-to-role.sh | ./yj -jt 1> output-10.toml
 
+output-11.toml: output-10.toml
+	cat output-10.toml | ./yj -tj | sh 11-create-subnet-for-database.sh | ./yj -jt 1> output-11.toml
+
+# aws ec2 describe-subnets | jq '.Subnets[] | {name: .Tags[].Value, vpc_id: .VpcId, subnet_id: .SubnetId, cidr: .CidrBlock, az: .AvailabilityZone}'
 
 
-
-
-#output-08.toml: output-07.toml
-#	cat output-07.toml | ./yj -tj | sh 08-create-iam-policy-and-attach-to-role.sh | ./yj -jt 1> output-08.toml
-#	cat output-06.toml | ./yj -tj | sh 07-run-ec2.sh | ./yj -jt 1> output-07.toml
-#output-08.toml: output-07.toml
-#	cat output-07.toml | ./yj -tj | sh 08-create-primitive-iam-role-and-attach-to-ec2.sh | ./yj -jt 1> output-08.toml
-#output-09.toml: output-08.toml
-#	cat output-08.toml | ./yj -tj | sh 08-create-primitive-iam-role-and-attach-to-ec2-as-instance-profile.sh #| ./yj -jt 1> output-09.toml
 
 
 
@@ -86,3 +81,6 @@ asahi-minimal-ssm-iam-policy.json:
 
 update-iam-policy: output-10.toml
 	cat output-10.toml | ./yj -tj | jq --raw-output '.ec2_instance_profile.iam_role.attached_iam_policies[0].arn' | xargs -I {arn} aws iam create-policy-version --policy-arn {arn} --policy-document file://./asahi-minimal-ssm-iam-policy.json --set-as-default
+
+state-ec2:
+	aws ec2 describe-instance-status
