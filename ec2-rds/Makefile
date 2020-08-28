@@ -34,12 +34,16 @@ output-11.toml: output-10.toml
 output-12.toml: output-11.toml
 	cat output-11.toml | ./yj -tj | sh 12-create-security-group-for-database.sh | ./yj -jt 1> output-12.toml
 
+output-13.toml: output-12.toml
+	cat output-12.toml | ./yj -tj | sh 13-create-db-subnet-group.sh #| ./yj -jt 1> output-13.toml
 
 
 
 
 .PHONY: cleanup
 cleanup:
+	@echo '---------------------------------------------[delete database subnet group]'
+	aws rds describe-db-subnet-groups | jq '.DBSubnetGroups[].DBSubnetGroupName' | xargs -I {db-subnet-group-name} aws rds delete-db-subnet-group --db-subnet-group-name {db-subnet-group-name}
 	@echo '---------------------------------------------[delete ec2 instances]'
 	aws ec2 describe-instances --filter Name=instance-state-name,Values=[running,pending] | jq '.Reservations[].Instances[].InstanceId' | xargs -I {instance-id} aws ec2 terminate-instances --instance-ids {instance-id}
 	@echo '---------------------------------------------[delete custom security group]'
