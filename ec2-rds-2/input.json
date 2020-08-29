@@ -32,7 +32,10 @@
     "instance_type": "t2.micro",
     "name": "asahi-instance"
   },
-  "ec2_instance_profile": {
+  "internet_gateway": {
+    "name": "asahi-internet-gateway"
+  },
+  "public_ec2_instance_profile": {
     "iam_role": {
       "assume_role_policy_file_path": "./ec2-role-trust-policy.json",
       "attached_iam_policies": [
@@ -44,9 +47,6 @@
       "name": "asahi-ec2-instance-role"
     },
     "name": "asahi-instance-profile"
-  },
-  "internet_gateway": {
-    "name": "asahi-internet-gateway"
   },
   "ssh_key_pair": {
     "name": "asahi-key",

@@ -32,14 +32,14 @@ name = "asahi-security-group"
 group_name = "asahi-security-group"
 description = "For asahi only. Do not use for other purpose to make it easier to delete it."
 
-[ec2_instance_profile]
+[public_ec2_instance_profile]
 name = "asahi-instance-profile"
 
-[ec2_instance_profile.iam_role]
+[public_ec2_instance_profile.iam_role]
 name                         = "asahi-ec2-instance-role"
 assume_role_policy_file_path = "./ec2-role-trust-policy.json"
 
-[[ec2_instance_profile.iam_role.attached_iam_policies]]
+[[public_ec2_instance_profile.iam_role.attached_iam_policies]]
 name                 = "asahi-minimal-ssm-iam-policy"
 iam_policy_file_path = "./asahi-minimal-ssm-iam-policy.json"
 
