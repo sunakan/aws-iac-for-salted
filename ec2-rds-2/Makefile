@@ -4,6 +4,7 @@ include ./revoke-default-security-group-rules.mk
 include ./create-subnet-for-public.mk
 include ./create-internet-gateway-and-attach.mk
 include ./create-custom-route-table-for-public.mk
+include ./create-route-for-public.mk
 include ./help.mk
 
 .DEFAULT_GOAL := all
@@ -19,6 +20,8 @@ all: input.json outputs
 	@make --no-print-directory create-internet-gateway-and-attach
 	@echo --------[ create custom route table ]
 	@make --no-print-directory create-custom-route-table-for-public
+	@echo --------[ create route for public ]
+	@make --no-print-directory create-route-for-public
 
 # input.jsonが無ければ作成、失敗したら削除する
 input.json:
