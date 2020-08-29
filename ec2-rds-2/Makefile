@@ -6,6 +6,7 @@ include ./create-internet-gateway-and-attach.mk
 include ./create-custom-route-table-for-public.mk
 include ./create-route-for-public.mk
 include ./associate-route-table-and-modify-subnets-for-public.mk
+include ./create-security-group-for-public.mk
 include ./help.mk
 
 .DEFAULT_GOAL := all
@@ -25,6 +26,8 @@ all: input.json outputs
 	@make --no-print-directory create-route-for-public
 	@echo --------[ associate route table and modify subnets for public ]
 	@make --no-print-directory associate-route-table-and-modify-subnets-for-public
+	@echo --------[ create security group for public ]
+	@make --no-print-directory create-security-group-for-public
 
 # input.jsonが無ければ作成、失敗したら削除する
 input.json:
@@ -36,6 +39,8 @@ outputs:
 	mkdir -p $(OUTPUT_BASE_PATH)
 
 cleanup: ## 作成したAWSリソースを全削除
+	@echo ----[ delete security group for public ]
+	@make --no-print-directory delete-security-group-for-public || true
 	@echo ----[ delete associations of public route -table ]
 	@make --no-print-directory delete-associations-of-public-route-table || true
 	@echo ----[ delete custom route table for public ]

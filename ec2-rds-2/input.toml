@@ -27,7 +27,7 @@ name = "asahi-route-table"
 name            = "asahi-key"
 secret_key_path = "./asahi-key.pem"
 
-[custom_security_group]
+[custom_security_group_for_public]
 name = "asahi-security-group"
 group_name = "asahi-security-group"
 description = "For asahi only. Do not use for other purpose to make it easier to delete it."

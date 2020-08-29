@@ -2,15 +2,15 @@
   "custom_route_table": {
     "name": "asahi-route-table"
   },
-  "custom_security_group": {
-    "description": "For asahi only. Do not use for other purpose to make it easier to delete it.",
-    "group_name": "asahi-security-group",
-    "name": "asahi-security-group"
-  },
   "custom_security_group_for_database": {
     "description": "For asahi only. Do not use for other purpose to make it easier to delete it.",
     "group_name": "asahi-security-group-for-database",
     "name": "asahi-security-group-for-database"
+  },
+  "custom_security_group_for_public": {
+    "description": "For asahi only. Do not use for other purpose to make it easier to delete it.",
+    "group_name": "asahi-security-group",
+    "name": "asahi-security-group"
   },
   "database": {
     "allocated_storage": 20,
