@@ -8,6 +8,7 @@ include ./create-route-for-public.mk
 include ./associate-route-table-and-modify-subnets-for-public.mk
 include ./create-security-group-for-public.mk
 include ./create-instance-profile-for-public.mk
+include ./create-iam-role-for-instance-profile.mk
 include ./help.mk
 
 .DEFAULT_GOAL := all
@@ -31,6 +32,8 @@ all: input.json outputs
 	@make --no-print-directory create-security-group-for-public
 	@echo --------[ create instance profile for public ]
 	@make --no-print-directory create-instance-profile-for-public
+	@echo --------[ create iam role for instance profile public ]
+	@make --no-print-directory create-iam-role-for-instance-profile
 
 # input.jsonが無ければ作成、失敗したら削除する
 input.json:
@@ -42,6 +45,8 @@ outputs:
 	mkdir -p $(OUTPUT_BASE_PATH)
 
 cleanup: ## 作成したAWSリソースを全削除
+	@echo ----[ delete iam role for instance profile ]
+	@make delete-iam-role-for-instance-profile || true
 	@echo ----[ delete delete instance profile for public ]
 	@make delete-instance-profile-for-public || true
 	@echo ----[ delete security group for public ]
