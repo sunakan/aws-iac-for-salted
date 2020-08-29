@@ -1,12 +1,15 @@
 include ./sts.mk
 include ./create-vpc.mk
+include ./revoke-default-security-group-rules.mk
 include ./help.mk
 
 .DEFAULT_GOAL := all
 .PHONY: all
 all: input.json outputs
-	@echo ----[ create-vpc ]
+	@echo --------[ create vpc ]
 	@make --no-print-directory create-vpc
+	@echo --------[ revoke default security group rules ]
+	@make --no-print-directory revoke-default-security-group-rules
 
 # input.jsonが無ければ作成、失敗したら削除する
 input.json:
