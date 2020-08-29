@@ -9,7 +9,7 @@ create-iam-role-for-instance-profile: init-variables-for-create-iam-role-for-ins
 .PHONY: output-iam-role-for-instance-profile-if-created
 output-iam-role-for-instance-profile-if-created: init-variables-for-create-iam-role-for-instance-profile
 	( aws iam get-role --role-name $(IAM_ROLE_NAME) > /dev/null 2>&1 ) \
-	&& aws iam get-role --role-name $(IAM_ROLE_NAME) | jq '.' > $(IAM_ROLE_FOR_INSTANCE_PROFILE_PUBLIC_JSON_PATH)
+	&& aws iam get-role --role-name $(IAM_ROLE_NAME) | jq '.Role' > $(IAM_ROLE_FOR_INSTANCE_PROFILE_PUBLIC_JSON_PATH)
 
 .PHONY: init-variables-for-create-iam-role-for-instance-profile
 init-variables-for-create-iam-role-for-instance-profile: input.json
