@@ -7,7 +7,7 @@ create-vpc: init-variables-for-create-vpc ## VPCを作成
 	make --no-print-directory output-vpc-json-if-created
 
 .PHONY: output-vpc-json-if-created
-output-vpc-json-if-created: init-variables-for-create-vpc outputs ## もし作成済みならjsonで出力
+output-vpc-json-if-created: init-variables-for-create-vpc outputs ## もしVPCを作成済みならjsonで出力
 	$(eval vpc := $(shell aws ec2 describe-vpcs --filters Name=cidr,Values=$(VPC_CIDR) Name=tag:Name,Values=$(VPC_TAG_NAME) | jq --compact-output --raw-output '.Vpcs[]'))
 	@[ -n "$(vpc)" ] && ( echo '$(vpc)' | jq > $(VPC_JSON_PATH) )
 
@@ -20,5 +20,5 @@ init-variables-for-create-vpc: input.json
 .PHONY: delete-created-vpc
 delete-created-vpc: init-variables-for-create-vpc
 	aws ec2 describe-vpcs --filters Name=cidr,Values=$(VPC_CIDR) Name=tag:Name,Values=$(VPC_TAG_NAME) \
-	| jq --compact-output '.Vpcs[].VpcId' \
-	| xargs -I {vpc-id} aws ec2 delete-vpc --vpc-id {vpc-id}
+		| jq --compact-output '.Vpcs[].VpcId' \
+		| xargs -I {vpc-id} aws ec2 delete-vpc --vpc-id {vpc-id}
