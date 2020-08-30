@@ -12,7 +12,7 @@ create-internet-gateway-and-attach: init-variables-for-create-internet-gateway-a
 .PHONY: output-internet-gateway-json-if-created
 output-internet-gateway-json-if-created: init-variables-for-create-internet-gateway-and-attach
 	$(eval INTERNET_GATEWAY := $(shell aws ec2 describe-internet-gateways --filters Name=attachment.vpc-id,Values=$(VPC_ID) Name=tag:Name,Values=$(INTERNET_GATEWAY_TAG_NAME) | jq --compact-output --raw-output '.InternetGateways[] | select(.InternetGatewayId)'))
-	@[ -n '$(INTERNET_GATEWAY)' ] && ( echo '$(INTERNET_GATEWAY)' | jq > $(INTERNET_GATEWAY_JSON_PATH))
+	@[ -n '$(INTERNET_GATEWAY)' ] && ( echo '$(INTERNET_GATEWAY)' | jq '.' > $(INTERNET_GATEWAY_JSON_PATH))
 
 .PHONY: init-variables-for-create-internet-gateway-and-attach
 init-variables-for-create-internet-gateway-and-attach: input.json

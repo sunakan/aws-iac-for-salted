@@ -9,7 +9,7 @@ create-instance-profile-for-public: init-variables-for-create-instance-profile-f
 .PHONY: output-instance-profile-for-public-if-created
 output-instance-profile-for-public-if-created: init-variables-for-create-instance-profile-for-public
 	$(eval INSTANCE_PROFILE := $(shell aws iam get-instance-profile --instance-profile-name $(IAM_INSTANCE_PROFILE_NAME) | jq --compact-output '.InstanceProfile'))
-	@[ -n '$(INSTANCE_PROFILE)' ] && ( echo '$(INSTANCE_PROFILE)' | jq > $(INSTANCE_PROFILE_FOR_PUBLIC_JSON_PATH) )
+	@[ -n '$(INSTANCE_PROFILE)' ] && ( echo '$(INSTANCE_PROFILE)' | jq '.' > $(INSTANCE_PROFILE_FOR_PUBLIC_JSON_PATH) )
 
 .PHONY: init-variables-for-create-instance-profile-for-public
 init-variables-for-create-instance-profile-for-public: input.json

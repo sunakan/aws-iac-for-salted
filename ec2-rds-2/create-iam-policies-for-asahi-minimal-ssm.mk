@@ -24,7 +24,7 @@ output-iam-policies-for-asahi-minimal-ssm: init-variables-for-create-iam-policie
 		| xargs -I {policy-names} sh -c "aws iam list-policies --scope Local | jq --compact-output '[.Policies[] | select(.PolicyName | test(\"({policy-names})\"))]'" \
 	))
 	@[ $(shell echo '$(CREATED_IAM_POLICIES)' | jq 'length') -eq $(shell echo '$(IAM_POLICIES)' | jq 'length') ] \
-	&& ( echo '$(CREATED_IAM_POLICIES)' | jq --raw-output > $(IAM_POLICIES_FOR_ROLE_INSTANCE_PROFILE_PUBLIC_JSON_PATH))
+	&& ( echo '$(CREATED_IAM_POLICIES)' | jq --raw-output '.' > $(IAM_POLICIES_FOR_ROLE_INSTANCE_PROFILE_PUBLIC_JSON_PATH))
 
 # 1. IAM PolicyのDefault Version以外をすべて削除
 # 2. IAM Policyを削除

@@ -9,7 +9,7 @@ create-security-group-for-public: init-variables-for-create-security-group-for-p
 .PHONY: output-security-group-for-public-json-if-created
 output-security-group-for-public-json-if-created: init-variables-for-create-security-group-for-public
 	$(eval SECURITY_GROUP := $(shell aws ec2 describe-security-groups --filters Name=vpc-id,Values=$(VPC_ID) Name=group-name,Values=$(SECURITY_GROUP_NAME) | jq --compact-output '.SecurityGroups[]'))
-	@[ -n '$(SECURITY_GROUP)' ] && ( echo '$(SECURITY_GROUP)' | jq > $(SECURITY_GROUP_FOR_PUBLIC_JSON_PATH) )
+	@[ -n '$(SECURITY_GROUP)' ] && ( echo '$(SECURITY_GROUP)' | jq '.' > $(SECURITY_GROUP_FOR_PUBLIC_JSON_PATH) )
 
 .PHONY: init-variables-for-create-security-group-for-public
 init-variables-for-create-security-group-for-public: input.json

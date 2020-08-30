@@ -9,7 +9,7 @@ create-custom-route-table-for-public: init-variables-for-create-custom-route-tab
 .PHONY: output-custom-route-table-for-public-if-created
 output-custom-route-table-for-public-if-created: init-variables-for-create-custom-route-table-for-public
 	$(eval CUSTOM_ROUTE_TABLE := $(shell aws ec2 describe-route-tables --filters Name=vpc-id,Values=$(VPC_ID) | jq --compact-output '.RouteTables[] | select(.RouteTableId != "$(MAIN_ROUTE_TABLE_ID)")'))
-	@[ -n "$(CUSTOM_ROUTE_TABLE)" ] && ( echo '$(CUSTOM_ROUTE_TABLE)' | jq > $(CUSTOM_ROUTE_TABLE_FOR_PUBLIC_JSON_PATH) )
+	@[ -n "$(CUSTOM_ROUTE_TABLE)" ] && ( echo '$(CUSTOM_ROUTE_TABLE)' | jq '.' > $(CUSTOM_ROUTE_TABLE_FOR_PUBLIC_JSON_PATH) )
 
 .PHONY: init-variables-for-create-custom-route-table-for-public
 init-variables-for-create-custom-route-table-for-public: input.json
