@@ -28,7 +28,7 @@ output-subnets-for-database: init-variables-for-create-subnets-for-database
 .PHONY: init-variables-for-create-subnets-for-database
 init-variables-for-create-subnets-for-database:
 	$(eval VPC_ID      := $(shell cat $(VPC_JSON_PATH) | jq --compact-output --raw-output 'select(.VpcId!=null).VpcId'))
-	$(eval VPC_SUBNETS := $(shell cat input.json       | jq --compact-output --raw-output '.vpc_database_subnets.subnets'))
+	$(eval VPC_SUBNETS := $(shell cat input.json       | jq --compact-output --raw-output '.database_subnet_group.vpc_database_subnets'))
 	@[ -n '$(VPC_ID)' ] && [ -n '$(VPC_SUBNETS)' ]
 
 .PHONY: delete-subnets-for-database

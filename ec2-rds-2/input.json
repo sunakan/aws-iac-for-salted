@@ -25,7 +25,24 @@
   "database_subnet_group": {
     "description": "For asahi db subnet group",
     "group_name": "asahi-db-subnet-group",
-    "name": "asahi-db-subnet-group"
+    "name": "asahi-db-subnet-group",
+    "vpc_database_subnets": [
+      {
+        "az": "ap-northeast-1a",
+        "cidr": "172.27.140.0/24",
+        "name": "asahi-database-a"
+      },
+      {
+        "az": "ap-northeast-1c",
+        "cidr": "172.27.141.0/24",
+        "name": "asahi-database-c"
+      },
+      {
+        "az": "ap-northeast-1d",
+        "cidr": "172.27.142.0/24",
+        "name": "asahi-database-d"
+      }
+    ]
   },
   "ec2": {
     "ami": "ami-0cc75a8978fbbc969",
@@ -55,25 +72,6 @@
   "vpc": {
     "cidr": "172.27.0.0/16",
     "name": "asahi"
-  },
-  "vpc_database_subnets": {
-    "subnets": [
-      {
-        "az": "ap-northeast-1a",
-        "cidr": "172.27.140.0/24",
-        "name": "asahi-database-a"
-      },
-      {
-        "az": "ap-northeast-1c",
-        "cidr": "172.27.141.0/24",
-        "name": "asahi-database-c"
-      },
-      {
-        "az": "ap-northeast-1d",
-        "cidr": "172.27.142.0/24",
-        "name": "asahi-database-d"
-      }
-    ]
   },
   "vpc_public_subnets": {
     "subnets": [

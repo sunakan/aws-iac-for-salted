@@ -49,21 +49,6 @@ name          = "asahi-instance"
 ami           = "ami-0cc75a8978fbbc969"
 instance_type = "t2.micro"
 
-[[vpc_database_subnets.subnets]]
-name = "asahi-database-a"
-cidr = "172.27.140.0/24"
-az   = "ap-northeast-1a"
-
-[[vpc_database_subnets.subnets]]
-name = "asahi-database-c"
-cidr = "172.27.141.0/24"
-az   = "ap-northeast-1c"
-
-[[vpc_database_subnets.subnets]]
-name = "asahi-database-d"
-cidr = "172.27.142.0/24"
-az   = "ap-northeast-1d"
-
 [custom_security_group_for_database]
 name        = "asahi-security-group-for-database"
 group_name  = "asahi-security-group-for-database"
@@ -73,6 +58,23 @@ description = "For asahi only. Do not use for other purpose to make it easier to
 name       = "asahi-db-subnet-group"
 group_name = "asahi-db-subnet-group"
 description = "For asahi db subnet group"
+
+[[database_subnet_group.vpc_database_subnets]]
+name = "asahi-database-a"
+cidr = "172.27.140.0/24"
+az   = "ap-northeast-1a"
+
+[[database_subnet_group.vpc_database_subnets]]
+name = "asahi-database-c"
+cidr = "172.27.141.0/24"
+az   = "ap-northeast-1c"
+
+[[database_subnet_group.vpc_database_subnets]]
+name = "asahi-database-d"
+cidr = "172.27.142.0/24"
+az   = "ap-northeast-1d"
+
+
 
 [database]
 name            = "asahi-db"
