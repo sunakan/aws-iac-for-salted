@@ -10,6 +10,7 @@ include ./create-security-group-for-public.mk
 include ./create-instance-profile-for-public.mk
 include ./create-iam-role-for-instance-profile.mk
 include ./add-role-to-instance-profile-for-public.mk
+include ./create-iam-policy-for-asahi-minimal-ssm.mk
 include ./help.mk
 
 .DEFAULT_GOAL := all
