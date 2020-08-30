@@ -8,5 +8,6 @@ SECURITY_GROUP_FOR_PUBLIC_JSON_PATH     := $(OUTPUT_BASE_PATH)/security-group-fo
 INSTANCE_PROFILE_FOR_PUBLIC_JSON_PATH   := $(OUTPUT_BASE_PATH)/instance-profile-for-public.json
 IAM_ROLE_FOR_INSTANCE_PROFILE_PUBLIC_JSON_PATH := $(OUTPUT_BASE_PATH)/iam-role-for-instance-profile-public.json
 IAM_POLICIES_FOR_ROLE_INSTANCE_PROFILE_PUBLIC_JSON_PATH := $(OUTPUT_BASE_PATH)/iam-policies-for-role-instance-profile-public.json
+EC2_FOR_PUBLIC_JSON_PATH := $(OUTPUT_BASE_PATH)/ec2-for-public.json
 
 ASSUME_ROLE_POLICY_FILE_PATH := $(PWD)/ec2-role-trust-policy.json

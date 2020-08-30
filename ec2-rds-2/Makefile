@@ -12,6 +12,8 @@ include ./create-iam-role-for-instance-profile.mk
 include ./add-role-to-instance-profile-for-public.mk
 include ./create-iam-policies-for-asahi-minimal-ssm.mk
 include ./attach-role-policies-for-public-ec2.mk
+include ./run-ec2-for-public.mk
+include ./ssm.mk
 include ./help.mk
 
 .DEFAULT_GOAL := all
@@ -43,6 +45,8 @@ all: input.json outputs
 	@make --no-print-directory create-iam-policies-for-asahi-minimal-ssm
 	@echo --------[ attach role policies for public ec2 ]
 	@make --no-print-directory attach-role-policies-for-public-ec2
+	@echo --------[ run ec2 for public ]
+	@make --no-print-directory run-ec2-for-public
 
 # input.jsonが無ければ作成、失敗したら削除する
 input.json:
@@ -54,6 +58,8 @@ outputs:
 	mkdir -p $(OUTPUT_BASE_PATH)
 
 cleanup: ## 作成したAWSリソースを全削除
+	@echo --------[ terminate ec2 for public ]
+	@make --no-print-directory terminate-ec2-for-public
 	@echo ----[ detach all policies from role for public ec2 ]
 	@make detach-all-policies-from-role-for-public-ec2
 	@echo ----[ delete iam policies for asahi minimal ssm ]
