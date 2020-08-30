@@ -1,22 +1,22 @@
 include ./shared-variables.mk
 
-.PHONY: create-iam-policy-for-asahi-minimal-ssm
-create-iam-policy-for-asahi-minimal-ssm: init-variables-for-create-iam-policy-for-asahi-minimal-ssm
-	make --no-print-directory output-iam-policy-for-asahi-minimal-ssm > /dev/null 2>&1 \
+.PHONY: create-iam-policies-for-asahi-minimal-ssm
+create-iam-policies-for-asahi-minimal-ssm: init-variables-for-create-iam-policies-for-asahi-minimal-ssm
+	make --no-print-directory output-iam-policies-for-asahi-minimal-ssm > /dev/null 2>&1 \
 	|| ( echo '$(IAM_POLICIES)' | jq --raw-output --compact-output '.[]' | while read iam_policy; do \
 		policy_name=$$(echo "$$iam_policy" | jq --raw-output '.name'); \
 		iam_policy_file_path=$$(echo "$$iam_policy" | jq --raw-output '.iam_policy_file_path'); \
 		aws iam create-policy --policy-name "$$policy_name" --policy-document "file://$$iam_policy_file_path" > /dev/null; \
 	done)
-	make --no-print-directory output-iam-policy-for-asahi-minimal-ssm
+	make --no-print-directory output-iam-policies-for-asahi-minimal-ssm
 
-.PHONY: init-variables-for-create-iam-policy-for-asahi-minimal-ssm
-init-variables-for-create-iam-policy-for-asahi-minimal-ssm: input.json
+.PHONY: init-variables-for-create-iam-policies-for-asahi-minimal-ssm
+init-variables-for-create-iam-policies-for-asahi-minimal-ssm: input.json
 	$(eval IAM_POLICIES := $(shell cat input.json | jq --compact-output --raw-output '.public_ec2_instance_profile.iam_role.attached_iam_policies'))
 	@[ -n '$(IAM_POLICIES)' ]
 
-.PHONY: output-iam-policy-for-asahi-minimal-ssm
-output-iam-policy-for-asahi-minimal-ssm: init-variables-for-create-iam-policy-for-asahi-minimal-ssm
+.PHONY: output-iam-policies-for-asahi-minimal-ssm
+output-iam-policies-for-asahi-minimal-ssm: init-variables-for-create-iam-policies-for-asahi-minimal-ssm
 	$(eval CREATED_IAM_POLICIES := $(shell echo '$(IAM_POLICIES)' \
 		| jq --raw-output '[.[].name] | @csv' \
 		| sed 's/,/|/g' \
@@ -29,7 +29,7 @@ output-iam-policy-for-asahi-minimal-ssm: init-variables-for-create-iam-policy-fo
 # 1. IAM PolicyのDefault Version以外をすべて削除
 # 2. IAM Policyを削除
 .PHONY: delete-iam-policies-for-asahi-minimal-ssm
-delete-iam-policies-for-asahi-minimal-ssm: init-variables-for-create-iam-policy-for-asahi-minimal-ssm
+delete-iam-policies-for-asahi-minimal-ssm: init-variables-for-create-iam-policies-for-asahi-minimal-ssm
 	echo '$(IAM_POLICIES)' \
 		| jq --raw-output '[.[].name] | @csv' \
 		| sed 's/,/|/g' \
