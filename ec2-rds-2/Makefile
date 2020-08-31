@@ -15,6 +15,8 @@ include ./attach-role-policies-for-public-ec2.mk
 include ./run-ec2-for-public.mk
 include ./ssm.mk
 include ./create-subnet-for-database.mk
+include ./create-security-group-for-database.mk
+include ./create-database-subnet-group.mk
 include ./help.mk
 
 .DEFAULT_GOAL := all
@@ -50,6 +52,8 @@ all: input.json outputs
 	@make --no-print-directory run-ec2-for-public
 	@echo --------[ create vpc subnets for database ]
 	@make --no-print-directory create-subnets-for-database
+	@echo --------[ create security group for database ]
+	@make --no-print-directory create-security-group-for-database
 
 # input.jsonが無ければ作成、失敗したら削除する
 input.json:
@@ -61,6 +65,8 @@ outputs:
 	mkdir -p $(OUTPUT_BASE_PATH)
 
 cleanup: ## 作成したAWSリソースを全削除
+	@echo --------[ delete delete security-group for database ]
+	@make --no-print-directory delete-security-group-for-database
 	@echo --------[ delete vpc subnets for database ]
 	@make --no-print-directory delete-subnets-for-database
 	@echo --------[ terminate ec2 for public ]
