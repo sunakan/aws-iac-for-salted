@@ -9,7 +9,7 @@ create-vpc: init-variables-for-create-vpc ## VPCを作成
 .PHONY: output-vpc-json-if-created
 output-vpc-json-if-created: init-variables-for-create-vpc outputs ## もしVPCを作成済みならjsonで出力
 	$(eval VPC := $(shell aws ec2 describe-vpcs --filters Name=cidr,Values=$(VPC_CIDR) Name=tag:Name,Values=$(VPC_TAG_NAME) | jq --compact-output --raw-output '.Vpcs[]'))
-	@[ -n "$(VPC)" ] && ( echo '$(VPC)' | jq > $(VPC_JSON_PATH) )
+	@[ -n '$(VPC)' ] && ( echo '$(VPC)' | jq '.' > $(VPC_JSON_PATH) )
 
 # VPC作成に必要な変数の定義
 .PHONY: init-variables-for-create-vpc

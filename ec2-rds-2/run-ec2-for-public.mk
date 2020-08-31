@@ -11,7 +11,7 @@ output-run-ec2-for-public-if-running: init-variables-for-run-ec2-for-public
 	$(eval EC2 := $(shell aws ec2 describe-instances --filter Name=subnet-id,Values=$(VPC_SUBNET_ID) Name=tag:Name,Values=$(EC2_TAG_NAME) Name=instance-state-name,Values=[running,pending] Name=iam-instance-profile.arn,Values=$(INSTANCE_PROFILE_ARN) \
 		| jq --compact-output --raw-output '.Reservations | select( length > 0 ) | .[0] | .Instances | select( length > 0 ) | .[0]' \
 	))
-	@[ -n '$(EC2)' ] && ( echo '$(EC2)' | jq > $(EC2_FOR_PUBLIC_JSON_PATH) )
+	@[ -n '$(EC2)' ] && ( echo '$(EC2)' | jq '.' > $(EC2_FOR_PUBLIC_JSON_PATH) )
 
 .PHONY: init-variables-for-run-ec2-for-public
 init-variables-for-run-ec2-for-public: input.json

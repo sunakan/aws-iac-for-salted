@@ -53,7 +53,7 @@ all: input.json outputs
 
 # input.jsonが無ければ作成、失敗したら削除する
 input.json:
-	( cat input.toml | rq --input-toml --output-json --format indented > input.json ) \
+	( cat input.toml | rq --input-toml --output-json --format indented '.' > input.json ) \
 		|| rm input.json
 
 # outputsディレクトリを作成
