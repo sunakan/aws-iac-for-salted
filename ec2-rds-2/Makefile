@@ -17,6 +17,7 @@ include ./ssm.mk
 include ./create-subnet-for-database.mk
 include ./create-security-group-for-database.mk
 include ./create-database-subnet-group.mk
+include ./add-ingress-rule-to-security-group-for-database.mk
 include ./help.mk
 
 .DEFAULT_GOAL := all
@@ -54,6 +55,8 @@ all: input.json outputs
 	@make --no-print-directory create-subnets-for-database
 	@echo --------[ create security group for database ]
 	@make --no-print-directory create-security-group-for-database
+	@echo --------[ add ingress rule to security group for database ]
+	@make --no-print-directory add-ingress-rule-to-security-group-for-database
 
 # input.jsonが無ければ作成、失敗したら削除する
 input.json:
@@ -65,7 +68,9 @@ outputs:
 	mkdir -p $(OUTPUT_BASE_PATH)
 
 cleanup: ## 作成したAWSリソースを全削除
-	@echo --------[ delete delete security-group for database ]
+	@echo --------[ revoke ingress rules from database security group ]
+	@make --no-print-directory revoke-ingress-rules-from-database-security-group
+	@echo --------[ delete security-group for database ]
 	@make --no-print-directory delete-security-group-for-database
 	@echo --------[ delete vpc subnets for database ]
 	@make --no-print-directory delete-subnets-for-database
