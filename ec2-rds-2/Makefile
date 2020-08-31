@@ -57,6 +57,8 @@ all: input.json outputs
 	@make --no-print-directory create-security-group-for-database
 	@echo --------[ add ingress rule to security group for database ]
 	@make --no-print-directory add-ingress-rule-to-security-group-for-database
+	@echo --------[ create database subnet group ]
+	@make --no-print-directory create-database-subnet-group
 
 # input.jsonが無ければ作成、失敗したら削除する
 input.json:
@@ -68,6 +70,8 @@ outputs:
 	mkdir -p $(OUTPUT_BASE_PATH)
 
 cleanup: ## 作成したAWSリソースを全削除
+	@echo --------[ delete database subnet group ]
+	@make --no-print-directory delete-database-subnet-group
 	@echo --------[ revoke ingress rules from database security group ]
 	@make --no-print-directory revoke-ingress-rules-from-database-security-group
 	@echo --------[ delete security-group for database ]
